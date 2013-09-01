@@ -2,15 +2,15 @@
 
 A gesture learning and recognition framework for the [Leap Motion](http://www.leapmotion.com/).
 
-Below is a video of the LeapTrainer UI learning and then recognizing some hand gestures.  
+Below is [a video of the LeapTrainer UI](http://www.youtube.com/watch?v=JVqalPM9pHs) learning and then recognizing some hand gestures.  
 
-An online demo of the UI [can be found right here](TODO).
+An online demo of the UI [can be found right here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
 
 [![ScreenShot](./resources/video-splash.png)](http://www.youtube.com/watch?v=JVqalPM9pHs)
 
 This framework currently supports high- and low- resolution gesture encoding and cross-correlation and neural network-based gesture recognition.  
 
-It is intended that developers [use this framework to explore alternative and improved capture and recognition algorithms](#Subclassing).
+It is intended that developers [use this framework to explore alternative and improved capture and recognition algorithms](#subclassing).
 
 All contributions are welcome - the best known implementation of each of the core framework functions will be used as the framework default.  Currently these are:
 
@@ -234,7 +234,7 @@ Sub-classes can be integrated into the LeapTrainer UI for testing and experiment
 
 ## <a id="TrainerUI"></a>The LeapTrainer UI
 
-Not every application will need to implement training of new gestures - so a LeapTrainer UI has been created for training and exporting gestures. An online demo of the UI [can be found here](TODO).
+Not every application will need to implement training of new gestures - so a LeapTrainer UI has been created for training and exporting gestures. An online demo of the UI [can be found here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
 
 This interface is also useful for experimentation with alternative algorithms for training and recognition, and for getting general feedback on what's happening 
 inside the framework at runtime.
