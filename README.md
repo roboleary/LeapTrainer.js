@@ -18,6 +18,23 @@ All contributions are welcome - the best known implementation of each of the cor
 * Low-resolution capture for simple gesture recording
 * Algebraic cross-correlation for gesture recognition
 
+
+## Table of contents
+
+* [Usage](#usage)
+* [Training new gestures](#training-new-gestures)
+* [Receiving events when gestures are detected](#receiving-events-when-gestures-are-detected)
+* [Importing and exporting gestures](#importing-and-exporting-gestures)
+* [Options](#options)
+* [Events](#events)
+* [API](#api)
+* [Sub-classing the LeapTrainer.Controller](#sub-classing-the-leaptrainercontroller)
+* [The LeapTrainer UI](#the-leaptrainer-ui)
+* [But it doesn't recognize my gang sign / secret handshake / full double-rimmer salute](#but-it-doesnt-recognize-my-gang-sign--secret-handshake--full-double-rimmer-salute)
+* [Author](#author)
+* [License](#license)
+
+
 ## Usage
 
 First, you'll need a [Leap Motion](http://www.leapmotion.com/) connected to the machine you're running your browser on.  The Leap monitors movement and transmits data to the browser via the [Leap Motion Javascript API](http://js.leapmotion.com/). 
@@ -46,7 +63,7 @@ The LeapTrainer controller constructor also accepts [a set of configuration vari
 
 For developers interested in developing new recording or recognition algorithms, [the LeapTrainer controller can be easily sub-classed](#sub-classing-the-leaptrainercontroller).
 
-Once a LeapTrainer controller is created it can be used to [train new gestures](#Training), [receive events when known gestures are detected](#receiving-events-when-gestures-are-detected), and [import and export gestures](#importing-and-exporting-gestures). 
+Once a LeapTrainer controller is created it can be used to train new gestures, [receive events when known gestures are detected](#receiving-events-when-gestures-are-detected), and [import and export gestures](#importing-and-exporting-gestures). 
 
 ## Training new gestures
 
@@ -265,7 +282,7 @@ Finally, trained gestures can be exported from the UI by clicking on them in the
 
 ![ScreenShot](./resources/training-ui-export.png)
 
-The training UI code is fully commented and can be used as is or modified in other applications (within the bounds of the [MIT license](http://en.wikipedia.org/wiki/MIT_License)).
+The training UI code is fully commented and can be used as is or modified in other applications (within the bounds of the [MIT license](http://www.opensource.org/licenses/mit-license.php)).
 
 
 ## But it doesn't recognize my gang sign / secret handshake / [full double-rimmer salute](http://www.youtube.com/watch?v=aXdtUISSHuo)
@@ -280,6 +297,8 @@ Alternatively, if you've got ideas how the framework might be improved - or if y
 ## Author
 
 Robert O'Leary
+
+Contact: robertjoleary AT gmail DOT com
 
 ## License
 
