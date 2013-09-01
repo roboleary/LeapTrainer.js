@@ -42,13 +42,13 @@ This object will internally create a [LeapMotion.Controller](http://js.leapmotio
 
 	leapController.connect();
 
-The LeapTrainer controller constructor also accepts [a set of configuration variables](#Options).  
+The LeapTrainer controller constructor also accepts [a set of configuration variables](#options).  
 
-For developers interested in developing new recording or recognition algorithms, [the LeapTrainer controller can be easily sub-classed](#Subclassing).
+For developers interested in developing new recording or recognition algorithms, [the LeapTrainer controller can be easily sub-classed](#sub-classing-the-leaptrainercontroller).
 
-Once a LeapTrainer controller is created it can be used to [train new gestures](#Training), [receive events when known gestures are detected](#Listening), and [import and export gestures](#Import). 
+Once a LeapTrainer controller is created it can be used to [train new gestures](#Training), [receive events when known gestures are detected](#receiving-events-when-gestures-are-detected), and [import and export gestures](#importing-and-exporting-gestures). 
 
-## <a id="Training"></a>Training new gestures
+## Training new gestures
 
 A new gesture can be created like this:
 
@@ -58,13 +58,13 @@ By default, calling the _create_ function will switch the controller into _train
 
 	trainer.create('Halt', true); // The controller won't switch to training mode
 
-While in _training mode_ LeapTrainer will watch for [a configured number of training gestures](#Options), and once enough input has been gathered _'Halt'_ will be added to the list of known gestures.  
+While in _training mode_ LeapTrainer will watch for [a configured number of training gestures](#options), and once enough input has been gathered _'Halt'_ will be added to the list of known gestures.  
 
-If a learning algorithm is being used that requires an initialization period (for example, [neural network-based  recognition](#Subclassing)) then a [training completion event](#Events) will fire once the algorithm has been fully initialized.
+If a learning algorithm is being used that requires an initialization period (for example, [neural network-based  recognition](#sub-classing-the-leaptrainercontroller)) then a [training completion event](#events) will fire once the algorithm has been fully initialized.
 
-The [LeapTrainer UI](#TrainerUI) can be used as an interface for training new gestures.
+The [LeapTrainer UI](#the-leaptrainer-ui) can be used as an interface for training new gestures.
 
-## <a id="Listening"></a>Receiving events when gestures are detected
+## Receiving events when gestures are detected
 
 Once a gesture has been learned LeapTrainer will fire an event with the name of the gesture whenever it is detected again.  
 
@@ -76,7 +76,7 @@ Previously registered listeners can unregister themselves using the _off()_ func
 
 	trainer.on('Halt', registeredFunction);
 
-## <a id="Import"></a>Importing and exporting gestures
+## Importing and exporting gestures
 
 Gestures can be exported from LeapTrainer for persistence or transport using the _toJSON()_ function, which accepts a gesture name as a parameter:
 
@@ -90,10 +90,10 @@ Sub-classes of the controller may implement alternative export formats. By defau
 
 	{"name":"Halt","data":[[1.940999984741211,8.213000297546387,...'}
 
-Since the training data format may change between controller sub-classes, it is not necessarily true that gestures exported from one LeapTrainer Controller sub-class will be compatible with another.  For example, the [neural network controller](#Subclassing) adds an encoded trained neural network to the export format so that networks don't need to be re-trained on import.
+Since the training data format may change between controller sub-classes, it is not necessarily true that gestures exported from one LeapTrainer Controller sub-class will be compatible with another.  For example, the [neural network controller](#sub-classing-the-leaptrainercontroller) adds an encoded trained neural network to the export format so that networks don't need to be re-trained on import.
 
 
-## <a id="Options"></a>Options
+## Options
 
 Options can be passed to the LeapTrainer.Controller constructor like so:
 
@@ -117,9 +117,9 @@ Some options apply to the default implementations of functions, and may be remov
 * **downtime**: The number of milliseconds after a gesture is identified before another gesture recording cycle can begin. This is useful, for example, to avoid a _'Swipe Left'_ gesture firing when a user moves his or her hand quickly back to center directly afer performing a _'Swipe Right'_ (default: 200)
 
 
-## <a id="Events"></a>Events
+## Events
 
-The LeapTrainer controller will emit events to [listening components](#Listening) during training and recognition.  
+The LeapTrainer controller will emit events to [listening components](#receiving-events-when-gestures-are-detected) during training and recognition.  
 
 Apart from events for the names of recognized gestures, several events inform listeners about activity inside the framework.  These events may be parameterized to provide listeners with more data. 
 
@@ -132,7 +132,7 @@ Components can register to listen for framework events in the same way as they r
 
 The framework events are:
 
-* **gesture-created**: Fired when a new gesture is added to a LeapTrainer controller object - either by a call to the _create()_ function or by importing a saved gesture via the _fromJSON()_ function.  Carries two parameters: _gestureName_ and _trainingSkipped_. The latter will be true if this gesture was created by a call to the _create()_ function [in which the second parameter was _true_](#Training).
+* **gesture-created**: Fired when a new gesture is added to a LeapTrainer controller object - either by a call to the _create()_ function or by importing a saved gesture via the _fromJSON()_ function.  Carries two parameters: _gestureName_ and _trainingSkipped_. The latter will be true if this gesture was created by a call to the _create()_ function [in which the second parameter was _true_](#training-new-gestures).
 
 * **training-started**: Fired when training begins on a gesture - carries a single parameter, _gestureName_
 
@@ -146,7 +146,7 @@ The framework events are:
 
 * **gesture-unknown**: Fired when a gesture is detected that doesn't match any known gesture sufficiently to be considered a match.  This event carries two parameters, _bestHit_ and _closestGestureName_, identifying the closest known gesture.
 
-## <a id="API"></a>API
+## API
 
 The LeapTrainer.Controller object offers the following functions, any or all of which can be overidden by sub-classes:
 
@@ -230,9 +230,9 @@ Sub-classes of the default LeapTrainer.Controller can be found in the /sub-class
 
 * **Neural network recognition** Implements artificial neural network-based gesture recognition. 
 
-Sub-classes can be integrated into the LeapTrainer UI for testing and experimentation [as described below](#TestingSubclasses).
+Sub-classes can be integrated into the LeapTrainer UI for testing and experimentation as described below.
 
-## <a id="TrainerUI"></a>The LeapTrainer UI
+## The LeapTrainer UI
 
 Not every application will need to implement training of new gestures - so a LeapTrainer UI has been created for training and exporting gestures. An online demo of the UI [can be found here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
 
@@ -270,11 +270,11 @@ The training UI code is fully commented and can be used as is or modified in oth
 
 ## But it doesn't recognize my gang sign / secret handshake / [full double-rimmer salute](http://www.youtube.com/watch?v=aXdtUISSHuo)
 
-Well, maybe not yet - we're just at version 0.1.  There are some [alternative capture and recognition functions](#Subclassing) already included, as well as a variety of [configuration options](#Options) so maybe selecting the right implementation and tuning the framework will yield better results for the kinds of gestures you need.
+Well, maybe not yet - we're just at version 0.1.  There are some [alternative capture and recognition functions](#sub-classing-the-leaptrainercontroller) already included, as well as a variety of [configuration options](#options) so maybe selecting the right implementation and tuning the framework will yield better results for the kinds of gestures you need.
 
 With more experimentation and with contributions from the Leap developers community, the training and recognition functions should improve over time. So if you're not getting the results you need now, check back in a while and see how we're doing.
 
-Alternatively, if you've got ideas how the framework might be improved - or if you just want to experiment with gesture training and recognition algorithms - you could take a look at [creating a sub-class of the LeapTrainer Controller](#Subclassing) yourself.
+Alternatively, if you've got ideas how the framework might be improved - or if you just want to experiment with gesture training and recognition algorithms - you could take a look at [creating a sub-class of the LeapTrainer Controller](#sub-classing-the-leaptrainercontroller) yourself.
 
 
 ## Author
@@ -282,5 +282,7 @@ Alternatively, if you've got ideas how the framework might be improved - or if y
 Robert O'Leary
 
 ## License
+
+Copyright (c) 2013 Robert O'Leary
 
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php). Go nuts.
