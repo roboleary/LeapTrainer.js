@@ -1,0 +1,99 @@
+body 													{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow: hidden; }
+
+#gestures-area 											{ float: left; width: 32%; max-width: 450px; min-height: 667px; background: #959595; display: none; }
+#gesture-creation-area 									{ height: 80px; padding-top: 30px; background: #5D5D5D; }
+
+#new-gesture 											{ width: 80%; height: 54px; margin-left: 10%; }
+
+.button													{ text-align: center; font-size: 14px; font-weight: bold; text-transform:uppercase; height: 50px; background: #87CEEB; border: 0px; color: #FFF; cursor: pointer; }
+
+#new-gesture-name 										{ width: 69%; float: left; padding: 0px 0px 0px 15px; outline: none; font-size: 14px; font-weight: bold; color: #5D5D5D; text-transform: uppercase; height: 50px; background: #FFFFFF; border: 0px; }
+#create-new-gesture 									{ width: 25%; float: left; }
+#new-gesture img 										{ margin-left: 20px; } 
+
+#existing-gestures 										{ margin-top: 60px; width: 100%; height: 300px; position: relative; overflow: hidden; }
+
+#existing-gestures ul 									{ list-style-type: none; width: 79%; margin-left: 5px; margin-top: 0px; font-size: 16px; font-weight: bold; color: #FFF; text-transform:uppercase; }
+
+#existing-gestures ul li 								{ height: 50px; line-height: 50px; padding-left: 10px; cursor: pointer; }
+#existing-gestures ul li .export-gesture				{ float: right; display: none; }
+#existing-gestures ul li img 							{ float: right; margin-right: -28px; display: none; }
+#existing-gestures ul li:hover							{ background: #87CEEB; margin-right: 28px; }
+#existing-gestures ul li:hover img 						{ display: block; background: #87CEEB; }
+#existing-gestures ul li:hover img.export-arrow 		{ display: none; }
+#existing-gestures ul li:hover .export-gesture			{ display: block; }
+#existing-gestures ul li .gesture-name 					{ float: left; }
+#existing-gestures ul li .training-set-size 			{ float: right; margin-right: 19px; text-align: right; }
+#existing-gestures ul li .training-label 				{ display: none; font-style: italic; float: right; }
+
+#existing-gestures ul li.selected 						{ background: #EDE941; margin-right: 28px; }
+#existing-gestures ul li.selected:hover					{ background: #87CEEB; }
+#existing-gestures ul li.selected.hit 					{ background: #9BEC42; }
+#existing-gestures ul li.selected.hit:hover 			{ background: #87CEEB; }
+#existing-gestures ul li.selected .gesture-name 		{ font-weight: bold; }
+#existing-gestures ul li.selected img 					{ background: #EDE941; display: block; }
+#existing-gestures ul li.selected img.export-arrow 		{ display: none; }
+#existing-gestures ul li.selected:hover img 			{ background: #87CEEB; }
+#existing-gestures ul li.selected.hit img 				{ background: #9BEC42; }
+#existing-gestures ul li.selected.hit:hover img 		{ background: #87CEEB; }
+#existing-gestures ul li.selected .training-label 		{ display: block; }
+#existing-gestures ul li.selected:hover .training-label { display: none; }
+
+.overlay-open #existing-gestures ul li.selected 					{ background: #87CEEB; width: 70%; position: absolute; z-index: 99999999999; }
+.overlay-open #existing-gestures ul li.selected img 				{ background: #87CEEB; }
+.overlay-open #existing-gestures ul li.selected img.training-arrow 	{ display: none; }
+.overlay-open #existing-gestures ul li.selected img.export-arrow 	{ display: block; }
+.overlay-open #existing-gestures ul li.selected .training-label 	{ display: none; }
+.overlay-open #existing-gestures ul li.selected .export-gesture		{ display: block; }
+
+
+#overlay-shade 											{ display: none; width: 100%; height: 1000px; position: absolute; z-index: 99998; background: #000; opacity: 0.7; }
+#overlay												{ display: none; width: 910px; height: 900px; padding: 20px; position: absolute; z-index: 99999; background: #FFF; top: 20px; left: 710px; }
+
+#overlay textarea 										{ width: 99%; height: 510px; font-size: 16px; border: 2px solid #959595; color: 5D5D5D; outline: none; }
+
+#overlay div 											{ padding: 0px 20px; font-size: 20px; line-height: 40px; }
+#sample-import-code 									{ margin: 30px 0px; padding: 20px; border: 2px solid #DDD; background: #EEE; }
+#exporting-gesture-name									{ text-transform:uppercase; }
+#close-overlay											{ float: right; padding: 0px 25px; margin-top: 20px; }
+
+.overlay-open #overlay-shade							{ display: block; }
+.overlay-open #overlay									{ display: block; }
+
+#output													{ display: none; }
+
+#output-area 											{ width: 68%; float: right; }
+#output-container 										{ width: 100%; position: relative; }
+#output-text 											{ width: 100%; text-align: center; position: absolute; }
+
+#output-text h1 										{ font-size: 70px; margin: 0px; text-transform: uppercase; overflow: hidden; }
+#output-text h2 										{ font-size: 25px; color: #949494; }
+#output-text h3 										{ font-size: 20px; color: #949494; }
+
+#chart-area 											{ position: absolute; background: #FFF; padding: 10px; }
+
+#fork-me												{ display: block; color: transparent; width: 149px; z-index: 99999999; position: absolute; top: 0px; right: 0px; height: 149px; background: url(../images/fork-me.png) transparent; outline: none; }
+
+#options-button 										{ position: absolute; bottom: 18px; right: 18px; padding: 0px 15px;  }
+
+#options 												{ max-width: 450px; display:none; position:fixed; top:0; height:100%; z-index:9999999999; 
+														  width:260px; overflow-x:none; overflow-y:auto; background:#959595; color:#fff; font-size: 14px; 
+														  font-weight: bold; text-transform:uppercase; left:auto; right:-260px; width: 32%; }
+
+#options .sidr-inner table								{ width: 80%; margin: 50px; }
+
+#options .sidr-inner									{ padding:0 0 15px; }
+#options .sidr-inner>p									{ margin-left:15px; margin-right:15px; }
+
+#options .sidr-inner table tbody tr td.sidr-class-label	{ text-align: right; width: 45%; line-height: 30px; }
+#options .sidr-inner table tbody tr td select			{ margin-left: 10px; width: 100%; height: 30px; font-weight: bold; color: #5D5D5D; }
+#options .sidr-inner table tbody tr td select option	{ padding: 5px 0px; line-height: 30px; }
+
+
+#sidr-id-open-configuration, 
+#sidr-id-close-configuration,
+#sidr-id-close-export-overlay 							{ text-transform: uppercase; }
+
+#options .sidr-inner table tbody tr td input			{ font-weight: bold; color: #5D5D5D; margin-left: 10px; padding-left: 10px; width: 90%; height: 30px; }
+
+#sidr-id-options-update-confirmation					{ display: none; width: 100%; height: 50px; line-height: 50px; font-size: 25px; font-weight: bold; background: #9BEC42; text-align: center; position: absolute; bottom: 18px; }
