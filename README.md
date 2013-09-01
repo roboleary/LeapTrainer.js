@@ -10,7 +10,7 @@ An online demo of the UI [can be found right here](https://rawgithub.com/robolea
 
 This framework currently supports high- and low- resolution gesture encoding and cross-correlation and neural network-based gesture recognition.  
 
-It is intended that developers [use this framework to explore alternative and improved capture and recognition algorithms](#Sub-classing the LeapTrainer.Controller).
+It is intended that developers [use this framework to explore alternative and improved capture and recognition algorithms](#sub-classing-the-leaptrainercontroller).
 
 All contributions are welcome - the best known implementation of each of the core framework functions will be used as the framework default.  Currently these are:
 
