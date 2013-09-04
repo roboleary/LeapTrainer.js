@@ -61,6 +61,7 @@ jQuery(document).ready(function ($) {
     var exportingName		= $('#exporting-gesture-name');
 	var exportingSampleText = $('#exporting-gesture-sample-text');
     var exportText 			= $('#export-text');
+    var retrainButton 		= $('#retrain-gesture');
     var closeOverlayButton 	= $('#close-overlay');
 
 	/*
@@ -188,10 +189,13 @@ jQuery(document).ready(function ($) {
     	for (var field in fields) {
 
     		func = replacementController.prototype[field];
-    		
-    		if (func.bind) { func.bind(trainer); }
-    		
-    		trainer[field] 	= func;
+
+    		if (func) {
+
+        		if (func.bind) { func.bind(trainer); }
+        		
+        		trainer[field] 	= func;    			
+    		}
     	}
 
     	optionsUpdated();
@@ -239,6 +243,13 @@ jQuery(document).ready(function ($) {
     /*
      * Prepare the export overlay
      */
+    retrainButton.click(function() {
+
+    	closeExportOverlay();
+    	
+    	trainer.retrain(exportingName.html());
+    });
+    
     closeOverlayButton.click(closeExportOverlay);
 
     overlayShade.on('click', function (e) { if (body.hasClass('overlay-open')) { closeExportOverlay(); } });
@@ -602,7 +613,7 @@ jQuery(document).ready(function ($) {
 	  
 		output.val(100).trigger('change').trigger('configure', { fgColor: red });
 		
-		setOutputText('Disconnected!', null, ' Check the connection to your Leap Motion!');
+		setOutputText('Disconnected!', null, ' Check the connection to your Leap Motion');
 	});
 
 	/*

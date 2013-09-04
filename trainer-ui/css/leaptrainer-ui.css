@@ -55,7 +55,8 @@ body 													{ font-family: Calibri; margin: 0px; -ms-touch-action: none; o
 #overlay div 											{ padding: 0px 20px; font-size: 20px; line-height: 40px; }
 #sample-import-code 									{ margin: 30px 0px; padding: 20px; border: 2px solid #DDD; background: #EEE; }
 #exporting-gesture-name									{ text-transform:uppercase; }
-#close-overlay											{ float: right; padding: 0px 25px; margin-top: 20px; }
+#close-overlay, #retrain-gesture						{ padding: 0px 25px; margin-top: 20px; }
+#close-overlay											{ float: right; }
 
 .overlay-open #overlay-shade							{ display: block; }
 .overlay-open #overlay									{ display: block; }
@@ -72,7 +73,7 @@ body 													{ font-family: Calibri; margin: 0px; -ms-touch-action: none; o
 
 #chart-area 											{ position: absolute; background: #FFF; padding: 10px; }
 
-#fork-me												{ display: block; color: transparent; width: 149px; z-index: 99999999; position: absolute; top: 0px; right: 0px; height: 149px; background: url(../images/fork-me.png) transparent; outline: none; }
+#fork-me												{ display: block; color: transparent; width: 149px; z-index: 99999999; position: absolute; top: 0px; right: 0px; height: 148px; background: url(../images/fork-me.png) transparent; outline: none; text-decoration: none; font-size: 0px; }
 
 #options-button 										{ position: absolute; bottom: 18px; right: 18px; padding: 0px 15px;  }
 

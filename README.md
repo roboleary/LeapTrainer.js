@@ -32,6 +32,7 @@ All contributions are welcome - the best known implementation of each of the cor
 * [The LeapTrainer UI](#the-leaptrainer-ui)
 * [But it doesn't recognize my gang sign / secret handshake / full double-rimmer salute](#but-it-doesnt-recognize-my-gang-sign--secret-handshake--full-double-rimmer-salute)
 * [Author](#author)
+* [Version](#version)
 * [License](#license)
 
 
@@ -181,6 +182,8 @@ The LeapTrainer.Controller object offers the following functions, any or all of 
 
 * **startTraining(gestureName)**: Sets the object-level trainingGesture variable. This modifies what happens when a gesture is detected by determining whether we save it as a training gesture or attempting to recognize it. This function fires the _'training-started'_ event.
 
+* **retrain(gestureName)**: Deletes the set of training gestures associated with the provided gesture name, and re-enters training mode for that gesture. If the provided name is unknown, then this function will return _false_.  Otherwise it will call the _startTraining_ function (resulting in a _'training-started'_ event being fired) and return _true_.
+
 * **trainAlgorithm(gestureName, trainingGestures)**: For recognition algorithms that need a training operation after training data is gathered, but before the gesture can be recognized, this function can be implemented and will be called in the _'saveTrainingGesture'_ function below when training data has been collected for a new gesture.
 
 * **saveTrainingGesture(gestureName, gesture)**: The saveTrainingGesture function records a single training gesture.  If the number of saved training gestures has reached _'trainingGestures'_, the training is complete and the system switches back out of training mode. This function fires the _'training-complete'_ and _'training-gesture-saved'_ events.
@@ -278,16 +281,44 @@ The configuration open and close functions, as well as the function used to clos
 
 ![ScreenShot](./resources/training-ui-gesture-config.png)
 
+Output from the leaptrainer controller is displayed in the center of the interface in the form of a partially filled colored ring.  The color indicates the type of output:
+
+* **Grey**: An unrecognized gesture
+* **Green**: Success - a recognized gesture or successful completion of gesture training
+* **Yellow**: a training gesture was recorded
+* **Red**: The connection to the Leap Motion device was lost
+
+![ScreenShot](./resources/training-ui-outputs.png)
+
+For each output type that corresponds to a gesture being detected, the amount of the ring filled with color is equal to the output value from the leaptrainer controller.  A complete match with a known gesture will output a 1.0, resulting in a completely filled green ring.  A gesture that was detected but doesn't result in a high enough match to qualify for recognition will result in a partially filled grey ring. 
+
+
+At the bottom left of the screen is a chart showing a graphical render of the last gesture recorded.
+
+![ScreenShot](./resources/training-ui-chart.png)
+
+When a gesture is detected by the leaptrainer controller it emits a _gesture-detected_ event.  This event carries the encoded gesture data and the number of frames recorded.  The gesture render chart displays the number of frames along the x-axis and the recorded values along the y-axis. 
+
+Since the amount and type of of data gathered per frame is variable depending on the implementation of the [**recordFrame** function](#api), the form of the graph will change depending on which _gesture encoding_ option is chosen in the interface configuration. 
+
+For example, the same gesture at low- and high- resolution recording looks like this:
+
+![ScreenShot](./resources/training-ui-high-low-res.png)
+
+The trick to recording useful and consistent training data is to try to keep the output in the gesture render chart relatively constant for each training gesture.
+
 Finally, trained gestures can be exported from the UI by clicking on them in the list of known gestures and copying the resulting JSON into the target application:
 
 ![ScreenShot](./resources/training-ui-export.png)
+
+The export overlay also provides a _retrain_ button that will return the interface to training mode for the selected gesture, allowing training data to be re-recorded for existing gestures. 
 
 The training UI code is fully commented and can be used as is or modified in other applications (within the bounds of the [MIT license](http://www.opensource.org/licenses/mit-license.php)).
 
 
 ## But it doesn't recognize my gang sign / secret handshake / [full double-rimmer salute](http://www.youtube.com/watch?v=aXdtUISSHuo)
 
-Well, maybe not yet - we're just at version 0.1.  There are some [alternative capture and recognition functions](#sub-classing-the-leaptrainercontroller) already included, as well as a variety of [configuration options](#options) so maybe selecting the right implementation and tuning the framework will yield better results for the kinds of gestures you need.
+Well, maybe not yet - it's a new system.  There are some [alternative capture and recognition functions](#sub-classing-the-leaptrainercontroller) already included, as well as a variety of [configuration options](#options) so maybe selecting the right implementation and tuning the framework will yield better results for the kinds of gestures you need.
 
 With more experimentation and with contributions from the Leap developers community, the training and recognition functions should improve over time. So if you're not getting the results you need now, check back in a while and see how we're doing.
 
@@ -299,6 +330,10 @@ Alternatively, if you've got ideas how the framework might be improved - or if y
 Robert O'Leary
 
 Contact: robertjoleary AT gmail DOT com
+
+## Version
+
+0.11
 
 ## License
 

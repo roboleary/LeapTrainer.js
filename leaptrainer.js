@@ -367,6 +367,31 @@ LeapTrainer.Controller = Class.extend({
 
 		this.fire('training-started', gestureName);
 	},
+	
+	/**
+	 * Deletes the set of training gestures associated with the provided gesture name, and re-enters training mode for that gesture. 
+	 * 
+	 * If the provided name is unknown, then this function will return FALSE.  Otherwise it will call the 
+	 * startTraining function (resulting in a 'training-started' event being fired) and return TRUE.
+	 * 
+	 * @param gestureName
+	 * @returns {Boolean}
+	 */
+	retrain: function(gestureName) { 
+		
+		var storedGestures = this.gestures[gestureName];
+		
+		if (storedGestures) {
+			
+			storedGestures.length = 0;
+
+			this.startTraining(gestureName);
+			
+			return true;
+		}
+		
+		return false;
+	},
 
 	/**
 	 * For recognition algorithms that need a training operation after training data is gathered, but before the 
