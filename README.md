@@ -340,3 +340,6 @@ Contact: robertjoleary AT gmail DOT com
 Copyright (c) 2013 Robert O'Leary
 
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php). Go nuts.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/roboleary/leaptrainer.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
