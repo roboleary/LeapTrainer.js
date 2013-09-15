@@ -1,22 +1,24 @@
-# LeapTrainer.js
+# LeapTrainer.js v0.2
 
 A gesture learning and recognition framework for the [Leap Motion](http://www.leapmotion.com/).
 
-Below is [a video of the LeapTrainer UI](http://www.youtube.com/watch?v=JVqalPM9pHs) learning and then recognizing some hand gestures.  
+**v0.2 contains an all new training UI, seen in the new video below**.  
 
-An online demo of the UI [can be found right here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
+For full details of the new features and fixes, [take a look at the release notes](#release-notes).
 
-[![ScreenShot](./resources/video-splash.png)](http://www.youtube.com/watch?v=JVqalPM9pHs)
+Below is [a video of the all new LeapTrainer UI](http://youtu.be/LlRsuY2zofw) learning and then recognizing some hand gestures.  An online demo of the UI [can be found right here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
 
-This framework currently supports high- and low- resolution gesture encoding and cross-correlation and neural network-based gesture recognition.  
+[![ScreenShot](./resources/video-splash.png)](http://youtu.be/LlRsuY2zofw)
+
+This framework currently supports high- and low- resolution gesture encoding and geometric template matching, cross-correlation, and neural network-based gesture recognition.  
 
 It is intended that developers [use this framework to explore alternative and improved capture and recognition algorithms](#sub-classing-the-leaptrainercontroller).
 
 All contributions are welcome - the best known implementation of each of the core framework functions will be used as the framework default.  Currently these are:
 
 * Gesture recording triggered by frame velocity
-* Low-resolution capture for simple gesture recording
-* Algebraic cross-correlation for gesture recognition
+* 3D geometric positioning capture for simple gesture recording
+* Geometric template matching for gesture recognition
 
 
 ## Table of contents
@@ -31,6 +33,8 @@ All contributions are welcome - the best known implementation of each of the cor
 * [Sub-classing the LeapTrainer.Controller](#sub-classing-the-leaptrainercontroller)
 * [The LeapTrainer UI](#the-leaptrainer-ui)
 * [But it doesn't recognize my gang sign / secret handshake / full double-rimmer salute](#but-it-doesnt-recognize-my-gang-sign--secret-handshake--full-double-rimmer-salute)
+* [Release Notes](#release-notes)
+* [Thanks](#thanks)
 * [Author](#author)
 * [Version](#version)
 * [License](#license)
@@ -92,7 +96,7 @@ Components can register to receive these events using the _on()_ function:
 
 Previously registered listeners can unregister themselves using the _off()_ function:
 
-	trainer.on('Halt', registeredFunction);
+	trainer.off('Halt', registeredFunction);
 
 ## Importing and exporting gestures
 
@@ -122,15 +126,19 @@ Some options apply to the default implementations of functions, and may be remov
 
 * **controller** : An instance of Leap.Controller class from the [Leap Motion Javascript API](http://js.leapmotion.com/).  This will be created with default settings if not passed as an option.
 
-* **minRecordingVelocity**: The minimum velocity a frame needs to be measured at in order to trigger gesture recording.  Frames with a velocity below this speed will cause recording to stop. Frame velocity is measured as the fastest moving hand or finger tip in view (default: 400)
+* **pauseOnWindowBlur** : If this variable is TRUE, then the LeapTrainer Controller will pause when the browser window loses focus, and resume when it regains focus (default: TRUE) 
+
+* **minRecordingVelocity**: The minimum velocity a frame needs to be measured at in order to trigger gesture recording.  Frames with a velocity below this speed will cause recording to stop. Frame velocity is measured as the fastest moving hand or finger tip in view (default: 300)
 
 * **minGestureFrames**: The minimum number of frames that can contain a recognisable gesture (default: 5)
 
-* **hitThreshold**: The return value of the recognition function above which a gesture is considered recognized. Raise this to make gesture recognition more strict (default: 0.6)
+* **hitThreshold**: The return value of the recognition function above which a gesture is considered recognized. Raise this to make gesture recognition more strict (default: 0.15)
 
-* **trainingGestures**: The number of training gestures required to be performed in training mode (default: 3)
+* **trainingCountdown**: The number of seconds after _startTraining_ is called that training begins. This number of _training-countdown_ events will be emit. (default: 3)
+ 
+* **trainingGestures**: The number of training gestures required to be performed in training mode (default: 1)
 
-* **convolutionFactor**: The factor by which training samples will be convolved over a gaussian distribution in order to expand the input training data. Set this to zero to disable convolution (default: 3)
+* **convolutionFactor**: The factor by which training samples will be convolved over a gaussian distribution in order to expand the input training data. Set this to zero to disable convolution (default: 0)
 
 * **downtime**: The number of milliseconds after a gesture is identified before another gesture recording cycle can begin. This is useful, for example, to avoid a _'Swipe Left'_ gesture firing when a user moves his or her hand quickly back to center directly afer performing a _'Swipe Right'_ (default: 200)
 
@@ -152,12 +160,18 @@ The framework events are:
 
 * **gesture-created**: Fired when a new gesture is added to a LeapTrainer controller object - either by a call to the _create()_ function or by importing a saved gesture via the _fromJSON()_ function.  Carries two parameters: _gestureName_ and _trainingSkipped_. The latter will be true if this gesture was created by a call to the _create()_ function [in which the second parameter was _true_](#training-new-gestures).
 
+* **training-countdown**: Fired a configurable number of times, once per second, after the _startTraining_ function is called, before the _training-started_ event fires and actual training begins
+
 * **training-started**: Fired when training begins on a gesture - carries a single parameter, _gestureName_
 
 * **training-complete**: Fired when training completes on a gesture - carries two parameters, _gestureName_ and _trainingGestures_.  The latter is the array of encoded gestures recorded during training.
 
 * **training-gesture-saved**: Fired during training when a new training gesture is recorded - carries two parameters, _gestureName_ and _trainingGestures_.  The latter is the array of encoded gestures recorded _so far_ during training, the last entry of which will be the gesture just recorded.
 
+* **started-recording**: Fired when the _recordableFrame_ function returns TRUE and causes gesture recording to begin
+
+* **stopped-recording**: Fired when the _recordableFrame_ function returns FALSE and recording was active, causing gesture recording to stop
+ 
 * **gesture-detected**: Fired when any gesture is detected, regardless of whether it is recognized or not.  This event fires before recognition is attempted and carries two parameters, _gesture_ and _frameCount_.  The first is the recorded encoded gesture, the second is the number of frames in the gesture. 
 
 * **gesture-recognized**: Fired when a known gesture is recognized - carries two parameters, _hit_ and _gestureName_. The _hit_ parameter is a value between 0.0 and 1.0 indicating how closely the recognized gesture was matched to the training data, with 1.0 being a 100% match.
@@ -178,21 +192,38 @@ The LeapTrainer.Controller object offers the following functions, any or all of 
 
 * **recordFrame(frame, lastFrame, recordVector, recordValue)**: Called for each frame during gesture recording, and it is responsible for adding values in frames using the provided recordVector and recordValue functions (which accept a 3-value numeric array and a single numeric value respectively). This function should be overridden to modify the quality and quantity of data recorded for gesture recognition.
 
-* **create(gestureName, skipTraining)**: Called to create a new gesture, and - normally - trigger training for that gesture. The parameter gesture name is added to the gestures array and unless the trainLater parameter is present, the startRecording function is triggered. This function fires the _'gesture-created'_ event.
+* **recordRenderableFrame(frame, lastFrame)**: Records a single frame in a format suited for graphical rendering.  Since the recordFrame function will capture data suitable for whatever recognition algorithm is implemented, that data is not necessarily relating to geometric positioning of detected hands and fingers.  Consequently, this function should capture this geometric data.
 
-* **startTraining(gestureName)**: Sets the object-level trainingGesture variable. This modifies what happens when a gesture is detected by determining whether we save it as a training gesture or attempting to recognize it. This function fires the _'training-started'_ event.
+Currently, only the last recorded gesture is stored - so this function should just write to the _renderableGesture_ array.
+
+Any format can be used - but the format expected by the LeapTrainer UI is - for each hand:
+
+	{	position: 	[x, y, z], 
+		direction: 	[x, y, z], 
+		palmNormal	[x, y, z], 
+	
+		fingers: 	[ { position: [x, y, z], direction: [x, y, z], length: q },
+	 				  { position: [x, y, z], direction: [x, y, z], length: q },
+					... ]
+	}
+
+So a frame containing two hands would push an array with two objects like that above into the _renderableGesture_ array.
+
+* **create(gestureName, skipTraining)**: Called to create a new gesture, and - normally - trigger the training countdown for that gesture. The parameter gesture name is added to the gestures array and unless the trainLater parameter is present, the startRecording function is triggered. This function fires the _'gesture-created'_ event.
+
+* **startTraining(gestureName, countdown)**: Counts down for _countdown_ seconds, firing a _'training-countdown'_ event on each iteration, and when the countdown reaches zero, sets the object-level _trainingGesture_ variable. This modifies what happens when a gesture is detected by determining whether we save it as a training gesture or attempting to recognize it. This function fires the _'training-countdown'_ and _'training-started'_ events.
 
 * **retrain(gestureName)**: Deletes the set of training gestures associated with the provided gesture name, and re-enters training mode for that gesture. If the provided name is unknown, then this function will return _false_.  Otherwise it will call the _startTraining_ function (resulting in a _'training-started'_ event being fired) and return _true_.
 
-* **trainAlgorithm(gestureName, trainingGestures)**: For recognition algorithms that need a training operation after training data is gathered, but before the gesture can be recognized, this function can be implemented and will be called in the _'saveTrainingGesture'_ function below when training data has been collected for a new gesture.
+* **trainAlgorithm(gestureName, trainingGestures)**: For recognition algorithms that need a training operation after training data is gathered, but before the gesture can be recognized, this function can be implemented and will be called in the _'saveTrainingGesture'_ function below when training data has been collected for a new gesture. The default implementation uses this function to prepare captured gesture data for [geometric template matching](#thanks)
 
 * **saveTrainingGesture(gestureName, gesture)**: The saveTrainingGesture function records a single training gesture.  If the number of saved training gestures has reached _'trainingGestures'_, the training is complete and the system switches back out of training mode. This function fires the _'training-complete'_ and _'training-gesture-saved'_ events.
 
 * **distribute(trainingGestures)**: Generates a normalized distribution of values around a set of recorded training gestures.  The objective of this function is to increase the size of the training data without actually requiring the user to perform more training gestures. The default implementation of this function generates a gaussian normalized distribution.
 
-* **recognize(gesture)**: Matches a parameter gesture against the known set of saved gestures.  This function does not need to return any value, but it should fire either the _'gesture-recognized'_ or the _'gesture-unknown'_ event, providing a numeric value for the closest match and the name of the closest known gesture as parameters to the event. If a gesture is recognized, an event with the name of the gesture and no parameters will also be fired.
+* **recognize(gesture, frameCount)**: Matches a parameter gesture against the known set of saved gestures.  This function does not need to return any value, but it should fire either the _'gesture-recognized'_ or the _'gesture-unknown'_ event, providing a numeric value for the closest match and the name of the closest known gesture as parameters to the event. If a gesture is recognized, an event with the name of the gesture and no parameters will also be fired.
 
-* **correlate(gestureName, trainingGestures, gesture)**: This function accepts a set of training gestures and a newly input gesture and produces a number between 0.0 and 1.0 describing how closely the input gesture resembles the set of training gestures. The default implementation uses a cross-correlation function (nicely described here http://paulbourke.net/miscellaneous/correlate/) to identify an average level of similarity between the input gesture and the whole set of training gestures.
+* **correlate(gestureName, trainingGestures, gesture)**: This function accepts a set of training gestures and a newly input gesture and produces a number between 0.0 and 1.0 describing how closely the input gesture resembles the set of training gestures. The default implementation uses  [_geometric template matching_](#thanks) to perform correlation.
 
 * **getRecordingTriggerStrategy()**: This and the two functions below are used by the training UI to select alternative strategies - sub-classes should override these functions with names for the algorithms they implement. Each function should return a descriptive name of the strategy implemented. By defult this function returns _'Frame velocity'_.
 
@@ -244,8 +275,10 @@ Consequently, a simple mechanism is provided for extending the LeapTrainer.Contr
 	    }
 	});
 
-Sub-classes of the default LeapTrainer.Controller can be found in the /sub-classes/ folder of the project.  Currently, two exist:
+Sub-classes of the default LeapTrainer.Controller can be found in the /sub-classes/ folder of the project.  Currently, three exist:
 
+* **Cross-correlation recognition**: This was the default recognition algorithm in the first version of the framework. It performs algebraic cross-correlation to detect simiarities between learned and input gestures.
+ 
 * **High-Resolution recorder**: Records much more data per frame - increases the accuracy of recorded gestures, but makes recognition that much more difficult.
 
 * **Neural network recognition** Implements artificial neural network-based gesture recognition. 
@@ -255,6 +288,8 @@ Sub-classes can be integrated into the LeapTrainer UI for testing and experiment
 ## The LeapTrainer UI
 
 Not every application will need to implement training of new gestures - so a LeapTrainer UI has been created for training and exporting gestures. An online demo of the UI [can be found here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).
+
+**Note:** _This training UI is a major upgrade for version 0.2 - replacing the original interface from v0.1._
 
 This interface is also useful for experimentation with alternative algorithms for training and recognition, and for getting general feedback on what's happening 
 inside the framework at runtime.
@@ -277,35 +312,29 @@ Setting the _recording trigger_, _gesture encoding_, or _recognition strategy_ v
 
 If an included javascript contains a sub-class of the LeapTrainer.Controller object, the UI will pick it up automatically and allow it to be selected as the active controller.  In this way new implementations can be easily tested by just including them in the training UI HTML page.
 
-The configuration open and close functions, as well as the function used to close overlays can be bound to learned gestures as an example of controlling an interface with gesture input. 
+The open and close functions for the options panel can be bound to learned gestures as an example of controlling an interface with gesture input. 
 
 ![ScreenShot](./resources/training-ui-gesture-config.png)
 
-Output from the leaptrainer controller is displayed in the center of the interface in the form of a partially filled colored ring.  The color indicates the type of output:
+Output from the leaptrainer controller is displayed in real-time as an animated hand on screen.  This hand moves as you move your hand above the Leap Motion.  Two hands can be also be rendered if you place a second hand in range of the device.  
 
-* **Grey**: An unrecognized gesture
-* **Green**: Success - a recognized gesture or successful completion of gesture training
-* **Yellow**: a training gesture was recorded
-* **Red**: The connection to the Leap Motion device was lost
+When the framework is recording, the hand(s) displayed on screen become yellow.  When recording stops, they return to white.
 
-![ScreenShot](./resources/training-ui-outputs.png)
+The hands are rendered in WebGL - consequently, rendering for browsers that do not support WebGL (_for example, Internet Explorer or Safari 5 on Windows_) switch to rendering on an HTML5 canvas. Since canvas rendering is less efficient than WebGL, the hands rendered in these browsers is less detailed, composed of less polygons.
 
-For each output type that corresponds to a gesture being detected, the amount of the ring filled with color is equal to the output value from the leaptrainer controller.  A complete match with a known gesture will output a 1.0, resulting in a completely filled green ring.  A gesture that was detected but doesn't result in a high enough match to qualify for recognition will result in a partially filled grey ring. 
+![ScreenShot](./resources/training-ui-hand.png)
 
+When the browser does not support WebGL, a warning is displayed at the bottom left of the screen.
 
-At the bottom left of the screen is a chart showing a graphical render of the last gesture recorded.
+![ScreenShot](./resources/training-ui-webgl-warning.png)
 
-![ScreenShot](./resources/training-ui-chart.png)
+When a gesture is learned or recognized, the data that was captured is rendered as a semi-transparent trail.
 
-When a gesture is detected by the leaptrainer controller it emits a _gesture-detected_ event.  This event carries the encoded gesture data and the number of frames recorded.  The gesture render chart displays the number of frames along the x-axis and the recorded values along the y-axis. 
+![ScreenShot](./resources/training-ui-trail.png)
 
-Since the amount and type of of data gathered per frame is variable depending on the implementation of the [**recordFrame** function](#api), the form of the graph will change depending on which _gesture encoding_ option is chosen in the interface configuration. 
+This trail disappears as soon as another gesture is detected (whether or not it was recognized).
 
-For example, the same gesture at low- and high- resolution recording looks like this:
-
-![ScreenShot](./resources/training-ui-high-low-res.png)
-
-The trick to recording useful and consistent training data is to try to keep the output in the gesture render chart relatively constant for each training gesture.
+Captured trails can be rotated by left-clicking and dragging with the mouse.  When a new gesture is detected the camera reverts back to its original position.
 
 Finally, trained gestures can be exported from the UI by clicking on them in the list of known gestures and copying the resulting JSON into the target application:
 
@@ -324,6 +353,34 @@ With more experimentation and with contributions from the Leap developers commun
 
 Alternatively, if you've got ideas how the framework might be improved - or if you just want to experiment with gesture training and recognition algorithms - you could take a look at [creating a sub-class of the LeapTrainer Controller](#sub-classing-the-leaptrainercontroller) yourself.
 
+##Release Notes
+
+**v0.2**
+
+* All new, all shiny training UI
+* New _started-recording_ and _stopped-recording_ events
+* New training countdown configuration variable and _training-countdown_ event
+* Fixed a bug in capture that was causing only absolute values to be recorded
+* Added _pauseOnWindowBlur_ configuration variable and functionality
+* New capture function - more detailed than the original v0.1 capture
+* Added geometric template matching as the new default recognition algorithm
+
+**v0.11**
+
+* Added a RETRAIN button to the overlay
+* Added documentation on the training UI chart
+
+**v0.1**
+
+* Low-resolution capture
+* Cross-correlation based recognition
+* The original training UI.
+
+## Thanks
+
+The geometric template matching implementation is based on the $P Point-Colud Recognizer, [which you can find right here](http://depts.washington.edu/aimgroup/proj/dollar/pdollar.html).  The algorithm itself [is described in this paper](http://faculty.washington.edu/wobbrock/pubs/icmi-12.pdf)
+
+The code used to render a 3D hand on screen is based on code from jestPlay, by Theo Armour, [which you can find right here](http://jaanga.github.io/gestification/cookbook/jest-play/r1/jest-play.html).  Thanks Theo!
 
 ## Author
 
@@ -333,7 +390,7 @@ Contact: robertjoleary AT gmail DOT com
 
 ## Version
 
-0.11
+0.2
 
 ## License
 
@@ -341,5 +398,6 @@ Copyright (c) 2013 Robert O'Leary
 
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php). Go nuts.
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/roboleary/leaptrainer.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+The $P Point-Cloud Recognizer is not directly used, but the geometric template matcher is based on it. $P is released under the New BSD License.
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/roboleary/leaptrainer.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

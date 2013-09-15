@@ -104,11 +104,11 @@ LeapTrainer.ANNController = LeapTrainer.Controller.extend({
 	 */
 	correlate: function(gestureName, trainingGestures, gesture) {
 
-		var hit = this.gestureNets[gestureName].run(gesture)[0];
+		var network = this.gestureNets[gestureName];
 		
-		console.log(hit);
-		
-		return hit;
+		if (network == null) { return 0.0; }
+
+		return network.run(gesture)[0];
 	},
 	
 	/**
