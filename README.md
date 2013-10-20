@@ -377,6 +377,10 @@ Alternatively, if you've got ideas how the framework might be improved - or if y
 * Pose training and recognition added
 * Assorted minor bug fixes and general tidying up
 * Some CSS tweaks to the training UI
+* _pauseOnWindowBlur_ set to FALSE by default
+* _downtime_ set to 1000 by default
+* Default _hitThreshold_ increased to 0.7
+* _maxRecordingVelocity_ and _minPoseFrames_ options added
 
 **v0.2**
 
