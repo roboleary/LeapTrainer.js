@@ -43,13 +43,15 @@ All contributions are welcome - the best known implementation of each of the cor
 
 ## What are gestures and poses?
 
-The [Leap Motion](http://www.leapmotion.com/) provides an awesome mechanism to track hand and fingertip movement within a space.  LeapTrainer.js builds on top of this by providing a simple API to record and later recognise hand movements and positions within this space.  This recognition capability can be easily integrated into new applications to help build motion interfaces. 
+The [Leap Motion](http://www.leapmotion.com/) provides a mechanism to track hand and fingertip movement within a space.  
 
-A gesture is a hand movement with a recognizable start and end - for example, a wave, a tapping motion, a swipe right or left, etc.
+LeapTrainer.js builds on top of this by providing a simple API to record and later recognise hand movements and positions within this space.  This recognition capability can be easily integrated into new applications to help build motion interfaces. 
+
+A gesture is a hand movement with a recognizable start and end - for example, a wave, a tapping motion, a swipe right or left.
 
 A pose is a hand position that is held motionless for a few moments - for example, holding up some fingers to indicate a number, pointing, or making a stop sign.
 
-The difference in how LeapTrainer recognizes gestures as opposed to poses is that gesture recognition starts when hand movement suddenly speeds up, and end when it slows down (*or stops*). So a quick karate chop will trigger gesture recognition. Pose recognition, on the other hand, starts when movement suddenly stops and remains more or less unchanged for a short period - so just holding a thumbs up for a moment or two will trigger pose recognition.
+The difference in how LeapTrainer recognizes gestures as opposed to poses is that gesture recognition starts when hand movement suddenly speeds up, and ends when it slows down (*or stops*). So a quick karate chop will trigger gesture recognition. Pose recognition, on the other hand, starts when movement suddenly stops and remains more or less unchanged for a short period - so just holding a thumbs-up for a moment or two will trigger pose recognition.
 
 ## Usage
 
