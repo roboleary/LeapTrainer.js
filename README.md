@@ -6,9 +6,9 @@ A gesture and pose learning and recognition framework for the [Leap Motion](http
 
 For full details of the new features and fixes, [take a look at the release notes](#release-notes).
 
-Below is [a video of the LeapTrainer UI](http://youtu.be/hTw2-y5adM0) learning and then recognizing some movements and poses.  An online demo of the UI [can be found right here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).  The previous v0.2 demo video can still be found [right here](http://youtu.be/LlRsuY2zofw).
+Below is [a video of the LeapTrainer UI](http://youtu.be/vOk7oyOA_BI) learning and then recognizing some movements and poses.  An online demo of the UI [can be found right here](https://rawgithub.com/roboleary/LeapTrainer.js/master/trainer-ui.html).  The previous v0.2 demo video can still be found [right here](http://youtu.be/LlRsuY2zofw).
 
-[![ScreenShot](./resources/video-splash.png)](http://youtu.be/hTw2-y5adM0)
+[![ScreenShot](./resources/video-splash.png)](http://youtu.be/vOk7oyOA_BI)
 
 This framework currently supports high- and low- resolution gesture encoding and geometric template matching, cross-correlation, and neural network-based gesture and pose recognition.  
 
