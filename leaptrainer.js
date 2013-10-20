@@ -130,11 +130,18 @@ LeapTrainer.Controller = Class.extend({
 	
 	controller				: null,	// An instance of Leap.Controller from the leap.js library.  This will be created if not passed as an option
 	
-	pauseOnWindowBlur		: true, // If this is TRUE, then recording and recognition are paused when the window loses the focus, and restarted when it's regained
+	pauseOnWindowBlur		: false, // If this is TRUE, then recording and recognition are paused when the window loses the focus, and restarted when it's regained
 	
-	minRecordingVelocity	: 300,	// The minimum velocity a frame needs to clock in at to trigger gesture recording, or below to stop recording (by default)
+	minRecordingVelocity	: 300,	// The minimum velocity a frame needs to clock in at to trigger gesture recording, or below to stop gesture recording (by default)
+	maxRecordingVelocity	: 30,	// The maximum velocity a frame can measure at and still trigger pose recording, or above which to stop pose recording (by default)
+	
 	minGestureFrames		: 5,	// The minimum number of recorded frames considered as possibly containing a recognisable gesture 
-	hitThreshold			: 0.15,	// The correlation output value above which a gesture is considered recognized. Raise this to make matching more strict
+	minPoseFrames			: 75,	// The minimum number of frames that need to hit as recordable before pose recording is actually triggered
+	
+	recordedPoseFrames		: 0,	// A counter for recording how many pose frames have been recorded before triggering
+	recordingPose			: false,// A flag to indicate if a pose is currently being recorded
+	
+	hitThreshold			: 0.7,	// The correlation output value above which a gesture is considered recognized. Raise this to make matching more strict
 
 	trainingCountdown		: 3,	// The number of seconds after startTraining is called that training begins. This number of 'training-countdown' events will be emit.
 	trainingGestures		: 1,	// The number of gestures samples that collected during training
@@ -144,7 +151,8 @@ LeapTrainer.Controller = Class.extend({
 	lastHit					: 0,	// The timestamp at which the last gesture was identified (recognized or not), used when calculating downtime
 	
 	gestures				: {},	// The current set of recorded gestures - names mapped to convolved training data
-
+	poses					: {},	// Though all gesture data is stored in the gestures object, here we hold flags indicating which gestures were recorded as poses
+	
 	trainingGesture			: null, // The name of the gesture currently being trained, or null if training is not active
 	listeners				: {},	// Listeners registered to receive events emit from the trainer - event names mapped to arrays of listener functions
 
@@ -206,7 +214,7 @@ LeapTrainer.Controller = Class.extend({
 		/*
 		 * Variables are declared locally here once in order to minimize variable creation and lookup in the high-speed frame listener.
 		 */
-		var recording = false, frameCount = 0, gesture = [];
+		var recording = false, frameCount = 0, gesture = [],
 
 		/*
 		 * These two utility functions are used to push a vector (a 3-variable array of numbers) into the gesture array - which is the 
@@ -224,13 +232,13 @@ LeapTrainer.Controller = Class.extend({
 	 		 * The pause() and resume() methods can be used to temporarily disable frame monitoring.
 	 		 */
 	 		if (this.paused) { return; }
-	 		
+
 	 		/*
 	 		 * Frames are ignored if they occur too soon after a gesture was recognized.
 	 		 */
 	 		if (new Date().getTime() - this.lastHit < this.downtime) { return; }
 
-			/*
+	 		/*
 			 * The recordableFrame function returns true or false - by default based on the overall velocity of the hands and pointables in the frame.  
 			 * 
 			 * If it returns true recording should either start, or the current frame should be added to the existing recording.  
@@ -239,7 +247,7 @@ LeapTrainer.Controller = Class.extend({
 			 * called to see what it can do with the collected frames.
 			 * 
 			 */
-			if (this.recordableFrame(frame, this.minRecordingVelocity)) {
+			if (this.recordableFrame(frame, this.minRecordingVelocity, this.maxRecordingVelocity)) {
 	
 				/*
 				 * If this is the first frame in a gesture, we clean up some running values and fire the 'started-recording' event.
@@ -250,7 +258,8 @@ LeapTrainer.Controller = Class.extend({
 					frameCount 				= 0; 
 					gesture 				= []; 
 					this.renderableGesture 	= []; 
-					
+					this.recordedPoseFrames = 0;
+
 					this.fire('started-recording'); 
 				}
 
@@ -273,7 +282,7 @@ LeapTrainer.Controller = Class.extend({
 				this.recordRenderableFrame(frame, this.controller.frame(1));
 				
 			} else if (recording) {
-	
+
 				/*
 				 * If the frame should not be recorded but recording was active, then we deactivate recording and check to see if enough 
 				 * frames have been recorded to qualify for gesture recognition.
@@ -285,8 +294,8 @@ LeapTrainer.Controller = Class.extend({
 				 */
 				this.fire('stopped-recording');
 	
-				if (frameCount >= this.minGestureFrames) {
-	
+				if (this.recordingPose || frameCount >= this.minGestureFrames) {
+
 					/*
 					 * If a valid gesture was detected the 'gesture-detected' event fires, regardless of whether the gesture will be recognized or not.
 					 */
@@ -299,11 +308,13 @@ LeapTrainer.Controller = Class.extend({
 					 */
 					var gestureName = this.trainingGesture;
 
-					if (gestureName) { this.saveTrainingGesture(gestureName, gesture);
+					if (gestureName) { this.saveTrainingGesture(gestureName, gesture, this.recordingPose);
 
 					} else { this.recognize(gesture, frameCount); }
 
 					this.lastHit = new Date().getTime();
+
+					this.recordingPose 		= false;
 				};
 			};
 			
@@ -338,9 +349,9 @@ LeapTrainer.Controller = Class.extend({
 	 * @param min
 	 * @returns {Boolean}
 	 */
-	recordableFrame: function (frame, min) {
+	recordableFrame: function (frame, min, max) {
 
-		var hands = frame.hands, j, hand, fingers, palmVelocity, tipVelocity;
+		var hands = frame.hands, j, hand, fingers, palmVelocity, tipVelocity, poseRecordable = false;
 		
 		for (var i = 0, l = hands.length; i < l; i++) {
 			
@@ -348,10 +359,14 @@ LeapTrainer.Controller = Class.extend({
 
 			palmVelocity = hand.palmVelocity;
 
+			palmVelocity = Math.max(Math.abs(palmVelocity[0]), Math.abs(palmVelocity[1]), Math.abs(palmVelocity[2]));
+			
 			/*
 			 * We return true if there is a hand moving above the minimum recording velocity
 			 */
-			if (Math.max(Math.abs(palmVelocity[0]), Math.abs(palmVelocity[1]), Math.abs(palmVelocity[2])) >= min) { return true; }
+			if (palmVelocity >= min) { return true; }
+			
+			if (palmVelocity <= max) { poseRecordable = true; break; }
 			
 			fingers = hand.fingers;
 			
@@ -359,12 +374,35 @@ LeapTrainer.Controller = Class.extend({
 
 				tipVelocity = fingers[j].tipVelocity;
 
+				tipVelocity = Math.max(Math.abs(tipVelocity[0]), Math.abs(tipVelocity[1]), Math.abs(tipVelocity[2]));
+				
 				/*
 				 * Or if there's a finger tip moving above the minimum recording velocity
 				 */
-				if (Math.max(Math.abs(tipVelocity[0]), Math.abs(tipVelocity[1]), Math.abs(tipVelocity[2])) >= min) { return true; }
+				if (tipVelocity >= min) { return true; }
+				
+				if (tipVelocity <= max) { poseRecordable = true; break; }
 			};	
 		};
+
+		/*
+		 * A configurable number of frames have to hit as pose recordable before actual recording is triggered.
+		 */
+		if (poseRecordable) {
+			
+			this.recordedPoseFrames++;
+			
+			if (this.recordedPoseFrames >= this.minPoseFrames) {
+
+				this.recordingPose = true;
+				
+				return true;
+			}
+
+		} else {
+			
+			this.recordedPoseFrames = 0;
+		}
 	},
 	
 	/**
@@ -462,7 +500,7 @@ LeapTrainer.Controller = Class.extend({
 		
 		this.renderableGesture.push(frameData);
 	},
-
+	
 	/**
 	 * This function is called to create a new gesture, and - normally - trigger training for that gesture.  
 	 * 
@@ -571,7 +609,7 @@ LeapTrainer.Controller = Class.extend({
 	 * @param gestureName
 	 * @param gesture
 	 */
-	saveTrainingGesture: function(gestureName, gesture) {
+	saveTrainingGesture: function(gestureName, gesture, isPose) {
 		
 		/*
 		 * We retrieve all gestures recorded for this gesture name so far
@@ -595,6 +633,11 @@ LeapTrainer.Controller = Class.extend({
 			this.gestures[gestureName] = this.distribute(trainingGestures);
 
 			/*
+			 * Whether or not the gesture was recorded as a pose is stored
+			 */
+			this.poses[gestureName] = isPose;
+			
+			/*
 			 * Setting the trainingGesture variable back to NULL ensures that the system will attempt to recognize subsequent gestures 
 			 * rather than save them as training data.
 			 */
@@ -609,7 +652,7 @@ LeapTrainer.Controller = Class.extend({
 			/*
 			 * Finally we fire the 'training-complete' event.
 			 */
-			this.fire('training-complete', gestureName, trainingGestures);
+			this.fire('training-complete', gestureName, trainingGestures, isPose);
 
 		} else { 
 
@@ -706,15 +749,14 @@ LeapTrainer.Controller = Class.extend({
 	 */
 	recognize: function(gesture, frameCount) {
 
-		var gestures 			= this.gestures;
-		var threshold			= this.hitThreshold;
-		
-		var allHits				= {};
-		var hit					= 0;
-		var bestHit				= 0;
-		var recognized			= false;
-		
-		var closestGestureName	= null;
+		var gestures 			= this.gestures,
+			threshold			= this.hitThreshold,
+			allHits				= {},
+			hit					= 0,
+			bestHit				= 0,
+			recognized			= false,
+			closestGestureName	= null,
+			recognizingPose		= (frameCount == 1); //Single-frame recordings are idenfied as poses
 
 		/*
 		 * We cycle through all known gestures
@@ -722,11 +764,21 @@ LeapTrainer.Controller = Class.extend({
 		for (var gestureName in gestures) {
 
 			/*
-			 * For each know gesture we generate a correlation value between the parameter gesture and a saved 
-			 * set of training gestures. This correlation value is a numeric value between 0.0 and 1.0 describing how similar 
-			 * this gesture is to the training set.
+			 * We don't actually attempt to compare gestures to poses
 			 */
-			hit = this.correlate(gestureName, gestures[gestureName], gesture);
+			if (this.poses[gestureName] != recognizingPose) { 
+				
+				hit = 0.0;
+				
+			} else {
+
+				/*
+				 * For each know gesture we generate a correlation value between the parameter gesture and a saved 
+				 * set of training gestures. This correlation value is a numeric value between 0.0 and 1.0 describing how similar 
+				 * this gesture is to the training set.
+				 */
+				hit = this.correlate(gestureName, gestures[gestureName], gesture);				
+			}
 
 			/*
 			 * Each hit is recorded
@@ -745,7 +797,7 @@ LeapTrainer.Controller = Class.extend({
 		}
 
 		if (recognized) { 
-			
+
 			this.fire('gesture-recognized', bestHit, closestGestureName, allHits);
 
 			this.fire(closestGestureName); 
@@ -822,7 +874,7 @@ LeapTrainer.Controller = Class.extend({
 		
 		var gesture = this.gestures[gestureName];
 		
-		if (gesture) { return JSON.stringify({name: gestureName, data: gesture}); }
+		if (gesture) { return JSON.stringify({name: gestureName, pose: this.poses[gestureName] ? true : false, data: gesture}); }
 	},
 	
 	/**
@@ -842,6 +894,8 @@ LeapTrainer.Controller = Class.extend({
 		this.create(gestureName, true);
 		
 		this.gestures[gestureName] = imp.data;
+		
+		this.poses[gestureName] = imp.pose;
 		
 		return imp;
 	},

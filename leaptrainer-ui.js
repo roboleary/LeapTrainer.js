@@ -66,7 +66,7 @@ jQuery(document).ready(function ($) {
 	 * Now we create the trainer controller, passing the leap controller as a parameter
 	 */
 	var trainer = new LeapTrainer.Controller({controller: controller});
-	
+
 	/*
 	 * We get the DOM crawling done now during setup, so it's not consuming cycles at runtime.
 	 */
@@ -108,8 +108,8 @@ jQuery(document).ready(function ($) {
 		 * Some constant colors are declared for interface modifications
 		 */
 		red					= '#EE5A40',
-		green				= '#2ECC71',
-		yellow				= '#EEE738',
+		green				= '#AFF372',
+		yellow				= '#EFF57E',
 		blue				= '#AFDFF1',
 		white				= '#FFFFFF',
 
@@ -294,7 +294,9 @@ jQuery(document).ready(function ($) {
     }
     
     setupOptionInput('minRecordingVelocity');
+    setupOptionInput('maxRecordingVelocity');
     setupOptionInput('minGestureFrames');
+    setupOptionInput('minPoseFrames');
     setupOptionInput('hitThreshold');
     setupOptionInput('trainingGestures');
     setupOptionInput('convolutionFactor');
@@ -553,7 +555,7 @@ jQuery(document).ready(function ($) {
 		gestureArrows[gestureName].css({display: arrowColor == 'transparent' ? 'none' : 'block', background: arrowColor});
 
 		var bar = progressBars[gestureName];
-		
+
 		bar.css({background: color});
 
 		bar.animate({width: val + '%'}, 200, 'swing');
@@ -656,10 +658,10 @@ jQuery(document).ready(function ($) {
 		/*
 		 * Wrapped references to the new DOM elements added are stored
 		 */
-		gestureEntries[gestureName]	= $(existingGestureList.find('li.selected')[0]);
-		progressBars[gestureName] 	= $(existingGestureList.find('li.selected .progress')[0]);
-		gestureLabels[gestureName] 	= $(existingGestureList.find('li.selected .label')[0]);
-		gestureArrows[gestureName] 	= $(existingGestureList.find('li.selected .progress .arrow')[0]);
+		gestureEntries[gestureName]	= $(gesture[0]);
+		progressBars[gestureName] 	= $(gesture.find('.progress')[0]);
+		gestureLabels[gestureName] 	= $(gesture.find('.label')[0]);
+		gestureArrows[gestureName] 	= $(gesture.find('.progress .arrow')[0]);
 		
 		/*
 		 * We reset the input box
@@ -696,7 +698,7 @@ jQuery(document).ready(function ($) {
 
 		var trainingGestureCount = trainer.trainingGestures;
 		
-		setOutputText('Perform the ' + gestureName + ' gesture ' + (trainingGestureCount > 1 ? trainingGestureCount + ' times' : ''));
+		setOutputText('Perform the ' + gestureName + ' gesture or pose ' + (trainingGestureCount > 1 ? trainingGestureCount + ' times' : ''));
 
 		gestureEntries[gestureName].css({background: 'transparent'});		
 		
@@ -726,13 +728,13 @@ jQuery(document).ready(function ($) {
 	 * When training completes we render the final training gesture, update the output text and gesture label, and set the gesture scale to 
 	 * 100% and green.
 	 */
-	trainer.on('training-complete', function(gestureName, trainingSet) {
+	trainer.on('training-complete', function(gestureName, trainingSet, isPose) {
 
 		training = false;		
 		
 		renderGesture();
 
-		setOutputText(gestureName + ' learned!');
+		setOutputText(gestureName + (isPose ? ' pose' : ' gesture') + ' learned!');
 
 		setGestureLabel(gestureName, 'Learned');
 		
@@ -774,7 +776,6 @@ jQuery(document).ready(function ($) {
 		clearGesture();
 	});
 
-	
 	/*
 	 * ------------------------------------------------------------------------------------------
 	 *  8. Leap controller event listeners
@@ -784,7 +785,7 @@ jQuery(document).ready(function ($) {
 	/*
 	 * When the controller connects to the Leap web service we update the output text
 	 */
-	controller.on('connect', function() { setOutputText('Create a gesture to get started'); });
+	controller.on('connect', function() { setOutputText('Create a gesture or pose to get started'); });
 
 	/*
 	 * BLUR and FOCUS event listeners can be added in order to display that the trainer is no longer listening for 

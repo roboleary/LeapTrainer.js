@@ -3,7 +3,7 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 #main 				{ position: fixed; background: #88CFEB; z-index: 1; }
 
 .button				{ text-align: center; font-size: 14px; outline: 0px; font-weight: bold; text-transform:uppercase; height: 50px; background: #C5E8F5; border: 0px; color: #FFF; cursor: pointer; }
-.button:focus		{ background: #C5E8F5; }
+.button:focus		{ background: #8AC9E1; }
 
 
 #gesture-creation-area 		{ height: 50px; background: #fff; margin: 22px 0px 0px 0px; padding-left: 22px; width: 318px; position: absolute; z-index: 9999; }
@@ -22,10 +22,6 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 #existing-gestures li.selected img.export-arrow 	 { display: none; }
 
 
-
-
-
-
 .overlay-open #existing-gestures li 							{ display: none; }
 .overlay-open #existing-gestures li.selected 					{ background: #AFDFF1; width: 88%; display: block; }
 .overlay-open #existing-gestures li.selected img 				{ background: #AFDFF1; }
@@ -39,7 +35,7 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 #overlay textarea 										{ width: 99%; height: 510px; font-size: 16px; border: 2px solid #959595; color: 5D5D5D; outline: none; }
 #overlay div 											{ padding: 0px 20px; font-size: 20px; line-height: 40px; }
 
-#sample-import-code 									{ margin: 30px 0px; padding: 20px; border: 2px solid #DDD; background: #EEE; }
+#sample-import-code 									{ margin: 30px 0px; padding: 20px; border: 2px solid #FFF; background: #F3FBFC; }
 #exporting-gesture-name									{ text-transform:uppercase; }
 #close-overlay, #retrain-gesture						{ padding: 0px 25px; margin-top: 20px; background: #88CFEB; }
 #close-overlay											{ float: right; }
@@ -53,11 +49,12 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 
 #version-tag, #fork-me									{ position: fixed; font-size: 13px; bottom: 22px; right: 0px; height: 20px; line-height: 20px; }
 #version-tag											{ width: 308px; text-align: left; padding-left: 32px; background: #A3DAEF; }
-#fork-me												{ display: block; text-decoration: none; color: #FFF; width: 170px; text-align: center; background: #EC6C42;}
+#fork-me												{ display: block; color: #FFF; width: 170px; text-align: center; background: #FC8C78;}
 #fork-me:hover											{ background: #FFF; color: #88CFEB; }
-#webgl-warning											{ display: none; position: absolute; left: 0px; bottom: 22px; height: 20px; line-height: 20px; z-index: 999; background: #EC6C42; padding: 0px 15px; font-size: 13px; }
+#webgl-warning											{ display: none; position: absolute; left: 0px; bottom: 22px; height: 20px; line-height: 20px; z-index: 999; background: #FC8C78; padding: 0px 15px; font-size: 13px; }
 
-#options-button 										{ position: absolute; top: 22px; padding-left: 27px; right: -29px; width: 140px; text-align: left; background: url('../images/options-arrow.png') 113px 0px #C5E8F5 no-repeat ; }
+#options-button 										{ position: absolute; top: 22px; padding-left: 27px; right: -29px; width: 140px; text-align: left; background: url('../images/options-arrow.png') 113px 0px #C5E8F5 no-repeat; }
+#options-button:focus									{ background: url('../images/options-arrow.png') 113px 0px #8AC9E1 no-repeat; }
 
 #options 												{ z-index: 0; position:fixed; right:0px; width:340px; background: #69C2E4; }
 #options table											{ width: 90%; margin: 20px; }
@@ -66,6 +63,9 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 #options table tbody tr td select						{ margin-left: 10px; width: 95%; height: 30px; font-size: 13px; border: 0px; font-weight: bold; color: #5D5D5D; outline: none; }
 #options table tbody tr td select option				{ padding: 5px 0px; line-height: 30px; }
 #options table tbody tr td input						{ outline: none; ont-weight: bold; color: #5D5D5D; margin-left: 10px; font-weight: bold; padding-left: 10px; width: 90%; height: 30px; border: 0px; }
+
+#options table tbody tr td select:focus,
+#options table tbody tr td input:focus					{ background: #F3FBFC; }
 
 #open-configuration, #close-configuration				{ text-transform: uppercase; }
 

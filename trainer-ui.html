@@ -2,7 +2,7 @@
 
 <html>
 	<head>
-		<title>Leap Trainer UI</title>
+		<title>Leap Trainer UI v.03</title>
 		
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
@@ -27,7 +27,7 @@
 
 			<input id="options-button" type="button" value="Options" class="button"/>
 
-			<div id="version-tag">LeapTrainer UI v0.02</div>
+			<div id="version-tag">LeapTrainer UI v0.03</div>
 
 			<a id="fork-me" href="https://github.com/roboleary/LeapTrainer.js" target="blank">Fork me on GitHub</a>
 		</div>
@@ -42,8 +42,12 @@
 					
 					<tr><td class="label">&nbsp;</td><td>&nbsp;</td></tr>
 					
-					<tr><td class="label">Recording velocity</td><td><input type="text" id="minRecordingVelocity"/></td></tr>
+					<tr><td class="label">Min. gesture velocity</td><td><input type="text" id="minRecordingVelocity"/></td></tr>
+					<tr><td class="label">Max. pose velocity</td><td><input type="text" id="maxRecordingVelocity"/></td></tr>
+					
 					<tr><td class="label">Min. gesture frames</td><td><input type="text" id="minGestureFrames"/></td></tr>
+					<tr><td class="label">Min. pose frames</td><td><input type="text" id="minPoseFrames"/></td></tr>
+					
 					<tr><td class="label">Hit threshold</td><td><input type="text" id="hitThreshold"/></td></tr>
 					<tr><td class="label">Training gestures</td><td><input type="text" id="trainingGestures"/></td></tr>
 					<tr><td class="label">Convolution factor</td><td><input type="text" id="convolutionFactor"/></td></tr>
