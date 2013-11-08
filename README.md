@@ -1,4 +1,4 @@
-# LeapTrainer.js v0.3
+# LeapTrainer.js v0.31
 
 A gesture and pose learning and recognition framework for the [Leap Motion](http://www.leapmotion.com/).
 
@@ -373,6 +373,11 @@ With more experimentation and with contributions from the Leap developers commun
 Alternatively, if you've got ideas how the framework might be improved - or if you just want to experiment with gesture training and recognition algorithms - you could take a look at [creating a sub-class of the LeapTrainer Controller](#sub-classing-the-leaptrainercontroller) yourself.
 
 ##Release Notes
+
+**v0.31**
+
+* Reduced overly restrictive hit threshold from 0.7 to 0.65
+* Decreased the gesture resample rate from 100 to 25 for increased accuracy
 
 **v0.3**
 

@@ -141,7 +141,7 @@ LeapTrainer.Controller = Class.extend({
 	recordedPoseFrames		: 0,	// A counter for recording how many pose frames have been recorded before triggering
 	recordingPose			: false,// A flag to indicate if a pose is currently being recorded
 	
-	hitThreshold			: 0.7,	// The correlation output value above which a gesture is considered recognized. Raise this to make matching more strict
+	hitThreshold			: 0.65,	// The correlation output value above which a gesture is considered recognized. Raise this to make matching more strict
 
 	trainingCountdown		: 3,	// The number of seconds after startTraining is called that training begins. This number of 'training-countdown' events will be emit.
 	trainingGestures		: 1,	// The number of gestures samples that collected during training
@@ -300,7 +300,7 @@ LeapTrainer.Controller = Class.extend({
 					 * If a valid gesture was detected the 'gesture-detected' event fires, regardless of whether the gesture will be recognized or not.
 					 */
 					this.fire('gesture-detected', gesture, frameCount);
-
+					
 					/*
 					 * Finally we pass the recorded gesture frames to either the saveTrainingGesture or recognize functions (either of which may also 
 					 * be overridden) depending on whether we're currently training a gesture or not.
@@ -422,7 +422,7 @@ LeapTrainer.Controller = Class.extend({
 		var handCount 	= hands.length;
 
 		var hand, finger, fingers, fingerCount;
-		
+
 		for (var i = 0, l = handCount; i < l; i++) {
 			
 			hand = hands[i];
@@ -431,7 +431,7 @@ LeapTrainer.Controller = Class.extend({
 
 			fingers 	= hand.fingers;
 			fingerCount = fingers.length;
-
+			
 			for (var j = 0, k = fingerCount; j < k; j++) {
 				
 				finger = fingers[j];
@@ -593,7 +593,7 @@ LeapTrainer.Controller = Class.extend({
 	 * @param trainingGestures
 	 */
 	trainAlgorithm: function (gestureName, trainingGestures) {
-
+		
 		for (var i = 0, l = trainingGestures.length; i < l; i++) { 
 
 			trainingGestures[i] = this.templateMatcher.process(trainingGestures[i]);
@@ -615,7 +615,7 @@ LeapTrainer.Controller = Class.extend({
 		 * We retrieve all gestures recorded for this gesture name so far
 		 */
 		var trainingGestures = this.gestures[gestureName];
-
+		
 		/*
 		 * Save the newly recorded gesture data
 		 */
@@ -1041,7 +1041,7 @@ LeapTrainer.Point = function (x, y, z, stroke) {
  */
 LeapTrainer.TemplateMatcher = Class.extend({
 
-	pointCount	: 100, 							// Gestures are resampled to this number of points
+	pointCount	: 25, 							// Gestures are resampled to this number of points
 	origin 		: new LeapTrainer.Point(0,0,0), // Gestures are translated to be centered on this point
 
 	/**
@@ -1057,12 +1057,12 @@ LeapTrainer.TemplateMatcher = Class.extend({
 		var points = [];
 		
 		var stroke = 1;
-		
+
 		for (var i = 0, l = gesture.length; i < l; i += 3) {
 
 			points.push(new LeapTrainer.Point(gesture[i], gesture[i + 1], gesture[i + 2], stroke));
 		}
-		
+
 		return this.translateTo(this.scale(this.resample(points, this.pointCount)), this.origin);	
 	},	
 	
