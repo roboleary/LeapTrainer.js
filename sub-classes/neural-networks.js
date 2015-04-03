@@ -41,9 +41,9 @@ LeapTrainer.ANNController = LeapTrainer.Controller.extend({
 	 * 
 	 * @param gestureName
 	 */
-	create: function(gestureName) { 
+	create: function(gestureName, skipTraining) { 
 
-		this._super(gestureName);
+		this._super.apply(this, arguments);
 		
 		this.gestureNets[gestureName] = new brain.NeuralNetwork({learningRate: this.learningRate}); 
 	},	
@@ -131,7 +131,7 @@ LeapTrainer.ANNController = LeapTrainer.Controller.extend({
 	 */
 	fromJSON: function(json) {
 
-		var imp = this._super(json);
+		var imp = this._super.apply(this, arguments);
 
 		this.gestureNets[imp.name].fromJSON(imp.net);
 	}
